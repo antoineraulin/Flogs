@@ -37,7 +37,7 @@ class LogsStorage {
     });
 
     //opening file
-    var file = File("$path/flog.txt");
+    var file = File("$path/devinci.log");
     var isExist = await file.exists();
 
     //check to see if file exist

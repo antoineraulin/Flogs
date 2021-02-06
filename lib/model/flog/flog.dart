@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:f_logs/f_logs.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:sembast/sembast.dart';
@@ -457,28 +458,22 @@ class FLog {
   ///
   /// This will write logs to local database
   static _writeLogs(Log log) async {
-    //check to see if user provides a valid configuration and logs are enabled
-    //if not then don't do anything
-    if (_isLogsConfigValid()) {
-      // skip write logs when log level is to low or
-      // active log level is not in enabled log levels
-      if (_config.activeLogLevel != null) {
-        // skip write logs when log level is to low
-        if (LogLevel.values.indexOf(_config.activeLogLevel) <=
-                LogLevel.values.indexOf(log.logLevel) &&
-            _config.logLevelsEnabled.contains(_config.activeLogLevel)) {
-          await _flogDao.insert(log);
+    // skip write logs when log level is to low or
+    // active log level is not in enabled log levels
+    if (_config.activeLogLevel != null) {
+      // skip write logs when log level is to low
+      if (LogLevel.values.indexOf(_config.activeLogLevel) <=
+              LogLevel.values.indexOf(log.logLevel) &&
+          _config.logLevelsEnabled.contains(_config.activeLogLevel)) {
+        await _flogDao.insert(log);
 
-          //check to see if logcat debugging is enabled
-          if (_config.isDebuggable) {
-            print(Formatter.format(log, _config));
-          }
+        //check to see if logcat debugging is enabled
+        if (_config.isDebuggable && !kReleaseMode) {
+          print(Formatter.format(log, _config));
         }
-      } else {
-        throw Exception(Constants.EXCEPTION_NULL_LOGS_LEVEL);
       }
     } else {
-      throw Exception(Constants.EXCEPTION_NOT_INIT);
+      throw Exception(Constants.EXCEPTION_NULL_LOGS_LEVEL);
     }
   }
 
